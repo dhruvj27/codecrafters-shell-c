@@ -23,10 +23,18 @@ int main() {
       arg = strtok(NULL, " ");
       return atoi(arg);
     }
+    else if (strcmp(cmd, "echo") == 0){
+      arg = strtok(NULL, " ");
+      while (arg != NULL){
+        printf("%s ",arg);
+        arg = strtok(NULL, " ");
+      }
+      printf("\n");
+    }
     else{
-    printf("%s: command not found\n",input);
+      printf("%s: command not found\n",input);
+    }
     printf("$ "); 
-    } 
   }
   return 0;
 }
