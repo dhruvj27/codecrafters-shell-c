@@ -14,6 +14,9 @@ int main() {
   char * cmd;
   char * arg;
 
+  char builtins[][10] = {"exit","echo","type"};
+  int i, flag, len_builtins = 3;
+
   while (1){
     fgets(input, 100, stdin);
 
@@ -30,6 +33,22 @@ int main() {
         arg = strtok(NULL, " ");
       }
       printf("\n");
+    }
+    else if (strcmp(cmd, "type") == 0){
+      flag = 0;
+      arg = strtok(NULL, " ");
+      for (i = 0; i < len_builtins; i++)
+      {
+        if (strcmp(builtins[i], arg) == 0){
+          printf("%s is a shell builtin\n",arg);
+          flag = 1;
+          break;
+        }
+      }
+      if (flag == 0){
+        printf("%s: not found\n",arg);
+      }
+      
     }
     else{
       printf("%s: command not found\n",input);
