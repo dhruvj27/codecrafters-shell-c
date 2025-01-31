@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <dirent.h>
 
 int main() {
   // Flush after every printf
@@ -11,32 +12,45 @@ int main() {
 
   // Wait for user input
   char input[100];
-  char * cmd;
-  char * arg;
+  char *cmd;
+  char *arg = NULL, *folder;
 
   char builtins[][10] = {"exit","echo","type"};
   int i, flag, len_builtins = 3;
 
+  DIR *d;
+  struct dirent *dir;
+
+  char * path = getenv("PATH");
+  char * path_copy = (char*)malloc(strlen(path)); 
   while (1){
     fgets(input, 100, stdin);
 
-    input[strlen(input) - 1] = '\0';
+    int l=strlen(input);
+    input[l - 1] = '\0';
+    //printf("%s,",input);
+    
     cmd = strtok(input, " ");
-    if (strcmp(cmd, "exit") == 0){
-      arg = strtok(NULL, " ");
-      return atoi(arg);
+    arg = realloc(arg, l - strlen(cmd));
+    strcpy(arg, input + strlen(cmd) + 1);
+    //printf("%s,%s\n",cmd,arg);
+    // printf("%s ",path);
+    if (strcmp(cmd, "exit") == 0)
+    {
+      free(path_copy);
+      i = atoi(arg);
+      free(arg);
+      return i;
     }
-    else if (strcmp(cmd, "echo") == 0){
-      arg = strtok(NULL, " ");
-      while (arg != NULL){
-        printf("%s ",arg);
-        arg = strtok(NULL, " ");
-      }
-      printf("\n");
+    else if (strcmp(cmd, "echo") == 0)
+    {
+      printf("%s\n",arg);
     }
-    else if (strcmp(cmd, "type") == 0){
+    else if (strcmp(cmd, "type") == 0)
+    {
       flag = 0;
-      arg = strtok(NULL, " ");
+      
+      
       for (i = 0; i < len_builtins; i++)
       {
         if (strcmp(builtins[i], arg) == 0){
@@ -45,6 +59,37 @@ int main() {
           break;
         }
       }
+
+      if (flag == 1)
+      {
+        printf("$ ");
+        continue;
+      }
+
+      strcpy(path_copy, path);
+      folder = strtok(path_copy, ":");
+      int count = 0;
+      do{
+        d = opendir(folder);
+        if (strcmp(folder,"/usr/bin") == 0  || strcmp(folder,"/bin") == 0) printf("%s ",folder);
+        if (d)
+        {
+          while ((dir = readdir(d)) != NULL)
+          {
+            if (dir->d_type == DT_REG && strcmp(dir->d_name, arg) == 0)
+            {
+              printf("%s is %s/%s\n",arg,folder,arg);
+              flag = 1;
+              break;
+            }
+          }
+        }
+        closedir(d);
+        if (flag == 1) break;
+      } 
+      while ((folder=strtok(NULL,":"))!=NULL);
+      
+
       if (flag == 0){
         printf("%s: not found\n",arg);
       }
@@ -55,5 +100,7 @@ int main() {
     }
     printf("$ "); 
   }
+  free(arg);
+  free(path_copy);
   return 0;
 }

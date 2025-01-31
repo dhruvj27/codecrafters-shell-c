@@ -6,7 +6,9 @@
 #
 # Learn more: https://codecrafters.io/program-interface
 
- # Exit early if any commands fail
+set -e # Exit early if any commands fail
+
+
 
 # Copied from .codecrafters/compile.sh
 #
@@ -21,9 +23,4 @@
 #
 # - Edit this to change how your program runs locally
 # - Edit .codecrafters/run.sh to change how your program runs remotely
-/tmp/shell-target "$@"; echo $?
-while true
-do
-  echo "Ctrl+C to stop"
-  sleep 1
-done
+exec /tmp/shell-target "$@"
