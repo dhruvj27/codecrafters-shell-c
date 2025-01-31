@@ -21,8 +21,8 @@ int main() {
   DIR *d;
   struct dirent *dir;
 
-  char * path = getenv("PATH");
-  char * path_copy = (char*)malloc(strlen(path)); 
+  char * path, * path_copy = NULL, *pathdup;
+  
   while (1){
     fgets(input, 100, stdin);
 
@@ -34,6 +34,9 @@ int main() {
     arg = realloc(arg, l - strlen(cmd));
     strcpy(arg, input + strlen(cmd) + 1);
     //printf("%s,%s\n",cmd,arg);
+
+    
+    //path_copy = (char*)malloc(strlen(path)); 
     // printf("%s ",path);
     if (strcmp(cmd, "exit") == 0)
     {
@@ -66,12 +69,13 @@ int main() {
         continue;
       }
 
-      strcpy(path_copy, path);
-      folder = strtok(path_copy, ":");
+      path = getenv("PATH");
+      pathdup = strndup(path, strlen(path));
+      folder = strtok(pathdup, ":");
       int count = 0;
       do{
         d = opendir(folder);
-        if (strcmp(folder,"/usr/bin") == 0  || strcmp(folder,"/bin") == 0) printf("%s ",folder);
+        //if (strcmp(folder,"/usr/bin") == 0  || strcmp(folder,"/bin") == 0) printf("%s ",folder);
         if (d)
         {
           while ((dir = readdir(d)) != NULL)
